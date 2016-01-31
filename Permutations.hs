@@ -25,11 +25,12 @@ layer n lst = [  take n lst ++ x | x <- rotate $ drop n lst ]
 -- Formula: map $ layer n + 1 $ layer n element from rotate input
 -- Condition: length input - 2 > 1, only one rotation for the last element
 
-layerize lst = layerize' (layer 0 lst) 0 where
+layerize lst = layerize' (layer 0 lst) 1 where
 	layerize' src counter
-		| length src - counter == 1 = counter
+		| length lst - counter == 1 = src
 		| otherwise = layerize' (concat $ map (layer counter) $ src) (counter + 1)
 
+--length $ layerize [1,2,3,4] = 24
 
 --concat $ map (layer 2) $ concat $ map (layer 1) $ layer 0 [1,2,3,4]:
 --[
@@ -39,6 +40,7 @@ layerize lst = layerize' (layer 0 lst) 0 where
 --[4,1,2,3],[4,1,3,2],[4,2,3,1],[4,2,1,3],[4,3,1,2],[4,3,2,1]
 --]
 
+--length $ layerize [1,2,3,4,5] = 120
 
 --concat $ map (layer 3) $ concat $ map (layer 2) $ concat $ map (layer 1) $ layer 0 [1,2,3,4,5]
 --[
