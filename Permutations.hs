@@ -1,38 +1,29 @@
 permute :: [a] -> [[a]]
 
---rotate constructs "rotations" of a list, e.g.:
---GHCi> rotate [1,2,3,4]
+--rotateList constructs "rotations" of a list, e.g.:
+--GHCi> rotateList [1,2,3,4]
 --[[1,2,3,4],[2,3,4,1],[3,4,1,2],[4,1,2,3]]
-rotate x = rotate' x [] 0 where
-	rotate' src dest n
+rotateList x = rotateList' x [] 0 where
+	rotateList' src dest n
 		| n == length x = dest
-		| otherwise = rotate' (tail src ++ [head src]) (dest ++ [src]) (n + 1)
+		| otherwise = rotateList' (tail src ++ [head src]) (dest ++ [src]) (n + 1)
 
---permTail gives permutations of the list's tail, e.g.:
---GHCi> permTail [1,2,3,4]
---[[1,2,3,4],[1,3,4,2],[1,4,2,3]]
-permTail (x:xs) = map (x:) $ rotate xs
+-- rotateTail 0 [1,2,3,4]: [[1,2,3,4],[2,3,4,1],[3,4,1,2],[4,1,2,3]], like rotateList
+-- rotateTail 1 [1,2,3,4]: [[1,2,3,4],[1,3,4,2],[1,4,2,3]]
+-- rotateTail 2 [1,2,3,4]: [[1,2,3,4],[1,2,4,3]]
+rotateTail n lst = [  take n lst ++ x | x <- rotateList $ drop n lst ]
 
-permute [] = [[]]
-permute x = concat $ map (\x -> permTail x) $ rotate x
-
-
--- layer 0 [1,2,3,4]: [[1,2,3,4],[2,3,4,1],[3,4,1,2],[4,1,2,3]], like rotate
--- layer 1 [1,2,3,4]: [[1,2,3,4],[1,3,4,2],[1,4,2,3]]
--- layer 2 [1,2,3,4]: [[1,2,3,4],[1,2,4,3]]
-layer n lst = [  take n lst ++ x | x <- rotate $ drop n lst ]
-
--- Formula: map $ layer n + 1 $ layer n element from rotate input
+-- Formula: map $ rotateTail n + 1 $ rotateTail n element from rotate input
 -- Condition: length input - 2 > 1, only one rotation for the last element
 
-layerize lst = layerize' (layer 0 lst) 1 where
-	layerize' src counter
+permute lst = permute' (rotateTail 0 lst) 1 where
+	permute' src counter
 		| length lst - counter == 1 = src
-		| otherwise = layerize' (concat $ map (layer counter) $ src) (counter + 1)
+		| otherwise = permute' (concat $ map (rotateTail counter) $ src) (counter + 1)
 
---length $ layerize [1,2,3,4] = 24
+--length $ permute [1,2,3,4] = 24
 
---concat $ map (layer 2) $ concat $ map (layer 1) $ layer 0 [1,2,3,4]:
+--concat $ map (rotateTail 2) $ concat $ map (rotateTail 1) $ rotateTail 0 [1,2,3,4]:
 --[
 --[1,2,3,4],[1,2,4,3],[1,3,4,2],[1,3,2,4],[1,4,2,3],[1,4,3,2],
 --[2,3,4,1],[2,3,1,4],[2,4,1,3],[2,4,3,1],[2,1,3,4],[2,1,4,3],
@@ -40,9 +31,9 @@ layerize lst = layerize' (layer 0 lst) 1 where
 --[4,1,2,3],[4,1,3,2],[4,2,3,1],[4,2,1,3],[4,3,1,2],[4,3,2,1]
 --]
 
---length $ layerize [1,2,3,4,5] = 120
+--length $ permute [1,2,3,4,5] = 120
 
---concat $ map (layer 3) $ concat $ map (layer 2) $ concat $ map (layer 1) $ layer 0 [1,2,3,4,5]
+--concat $ map (rotateTail 3) $ concat $ map (rotateTail 2) $ concat $ map (rotateTail 1) $ rotateTail 0 [1,2,3,4,5]
 --[
 --[1,2,3,4,5],[1,2,3,5,4],[1,2,4,5,3],[1,2,4,3,5],[1,2,5,3,4],[1,2,5,4,3],
 --[1,3,4,5,2],[1,3,4,2,5],[1,3,5,2,4],[1,3,5,4,2],[1,3,2,4,5],[1,3,2,5,4],
