@@ -4,9 +4,9 @@ permute :: [a] -> [[a]]
 --GHCi> rotateList [1,2,3,4]
 --[[1,2,3,4],[2,3,4,1],[3,4,1,2],[4,1,2,3]]
 rotateList x = rotateList' x [] 0 where
-	rotateList' src dest n
-		| n == length x = dest
-		| otherwise = rotateList' (tail src ++ [head src]) (dest ++ [src]) (n + 1)
+	rotateList' src dst n
+		| n == length x = dst
+		| otherwise = rotateList' (tail src ++ [head src]) (dst ++ [src]) (n + 1)
 
 -- rotateTail 0 [1,2,3,4]: [[1,2,3,4],[2,3,4,1],[3,4,1,2],[4,1,2,3]], like rotateList
 -- rotateTail 1 [1,2,3,4]: [[1,2,3,4],[1,3,4,2],[1,4,2,3]]
